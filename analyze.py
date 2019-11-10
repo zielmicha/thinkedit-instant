@@ -1,5 +1,8 @@
 import json, sys, functools, collections, argparse
 
+SINGLE_VALUE_LENGTH = 40
+MULTIPLE_VALUES_LENGTH = 70
+
 def ellipsize(text, length):
     text = text.replace('\n', '⁋')
     if len(text) > length:
@@ -42,15 +45,15 @@ def render(data):
         result = []
         for name, info in v.items():
             types = set( type_ for type_, _ in info )
-            values = '┇'.join(dedup([ ellipsize(v, 25) for _, v in info ]))
-            result.append('%s:%s=%s' % (name, '|'.join(types), ellipsize(values, 60)))
+            values = '┇'.join(dedup([ ellipsize(v, SINGLE_VALUE_LENGTH) for _, v in info ]))
+            result.append('%s:%s=%s' % (name, '|'.join(types), ellipsize(values, MULTIPLE_VALUES_LENGTH)))
 
         header = ''
         if v:
             count = max(map(len, v.values()))
             header += '[%d] ' % count
 
-        rendered[lineno] = header + '┃'.join(result)
+        rendered[lineno] = header + ' ┃ '.join(result)
 
     return rendered
 

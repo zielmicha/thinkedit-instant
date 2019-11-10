@@ -27,7 +27,8 @@ class LineTracer:
 
             if event == 'exception':
                 exc = arg[1]
-                self.result.append((lineno, "exc", str(exc), type(exc).__name__))
+                if not isinstance(exc, (GeneratorExit, StopIteration)):
+                    self.result.append((lineno, "exc", str(exc), type(exc).__name__))
 
             if event == 'return':
                 repr_value = repr(arg)
@@ -45,6 +46,7 @@ def tracer(frame, event, arg):
 
     tracer = LineTracer(frame.f_lineno)
     trace_result.append(tracer)
+
     return tracer
 
 def find_declared_variables(root_node):
@@ -84,7 +86,7 @@ if __name__ == '__main__':
     del sys.argv[0:1]
     try:
         runpy.run_path(sys.argv[0], run_name='__main__')
-    except Exception:
+    except:
         traceback.print_exc()
     finally:
         sys.settrace(None)

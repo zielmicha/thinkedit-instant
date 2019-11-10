@@ -1,7 +1,19 @@
-import random
+import random, time
 
 def fun1():
     return random.randrange(100)
+
+def throw():
+    xoxo
+
+def write_to_file():
+    # OK
+    with open('/tmp/info.txt', 'w') as f:
+        f.write('foo')
+
+    # not OK
+    with open('info.txt', 'w') as f:
+        f.write('foo')
 
 def main():
     x = 5
@@ -17,10 +29,18 @@ def main():
 
         x += 100
 
+    try:
+        write_to_file()
+    except Exception as exc:
+        _ = exc
+
     fun1()
     print(x)
 
-    1/0
+    try:
+        throw()
+    except Exception as exc:
+        pass
 
     _ = x
     return x

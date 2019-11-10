@@ -4,7 +4,9 @@
 
 (make-variable-buffer-local 'instant/current-overlays)
 (make-variable-buffer-local 'instant/state-overlay)
-;(make-variable-buffer-local 'instant/run-command)
+
+(defun instant/run-internal-script ()
+  (concat (file-name-directory (symbol-file 'instant/run-internal-script)) "/run.sh"))
 
 (defun instant/add-overlay (lineno text)
   (save-excursion
@@ -25,14 +27,15 @@
   (let* (
         (tempdir (string-trim (shell-command-to-string "mktemp -d")))
         (out-buffer (get-buffer-create "*thinkedit-instant-output*"))
-        (p (make-process :name "thinkedit-instant-run" :buffer out-buffer :command (list "python3" "run_tracer.py" tempdir filename))))
+        (p (make-process :name "thinkedit-instant-run" :buffer out-buffer
+                         :command (list (instant/run-internal-script) "run_tracer.py" tempdir filename))))
     (set-process-sentinel p (lambda (p e) (instant/process-trace filename tempdir callback)))))
 
 (defun instant/process-trace (filename tempdir callback)
   (let* (
          (out-buffer (get-buffer-create "*thinkedit-instant-output*"))
          (p (make-process :name "thinedit-instant-analyze" :buffer out-buffer :command
-                          (list "python3" "analyze.py" (concat tempdir "/trace.json") (concat tempdir "/out.json")))))
+                          (list (instant/run-internal-script) "analyze.py" (concat tempdir "/trace.json") (concat tempdir "/out.json")))))
     (set-process-sentinel
      p
      (lambda (p e)
